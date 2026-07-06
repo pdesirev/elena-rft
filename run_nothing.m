@@ -28,11 +28,16 @@ A = L{'*'};
 for i = 1:numel(A)
     elname = A{i}.get_name();
     if strcmp(elname, 'LNR.ACWO2.0530')
-        A{i}.set_coefficients = 20;
-        A{i}.set_frequency = f_rf;
+        A{i}.set_coefficients(20.0);
+        A{i}.set_frequency(f_rf);
+        A{i}.set_phid(-90.0);
+        A{i}.set_t0(0.0);
     end
 end
 
+B_refp = Bunch6d(mass, charge, Q, [0.0, 0.0, 0.0, 0.0, 0.0, P_ref]);
+B1 = L.track(B_refp); % checking if the reference particle gets lost
+return
 % TURNS
 emitt_x = [];
 emitt_y = [];
