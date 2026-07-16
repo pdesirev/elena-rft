@@ -17,7 +17,7 @@ beta_rel = P_ref/E;
 % Define IBS
 
 % Gaussian buch
-M = load('Results/initial_particles.dat');
+M = load('Results/initial_particles_L.dat');
 B0 = Bunch6dT(mass, charge, Q, M);
 
 % ALWAYS CHECK THAT THE TWISS FILE WAS GENERATED WITH THE GOOD PARAMETERS

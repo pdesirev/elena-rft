@@ -2,7 +2,7 @@ addpath('/home/pdesirev/rf-track-2.1')
 RF_Track;
 
 % Gaussian buch
-M = load('Results/initial_particles.dat');
+M = load('Results/initial_particles_L.dat');
 mass = RF_Track.protonmass;
 Q = -1; % antiprotons
 charge = 1e7;
@@ -29,7 +29,7 @@ for i = 1:numel(A)
     elname = A{i}.get_name();
     if strcmp(elname, 'LNR.ACWO2.0530')
         l_rf = A{i}.get_length();
-        P = Pillbox_Cavity(0.0/l_rf, f_rf,l_rf, 1.0);
+        P = Pillbox_Cavity(20.0/l_rf, f_rf,l_rf, 1.0);
         P.set_phid(-90.0);
         A{i}.replace_with(P);
     end
@@ -42,9 +42,10 @@ emitt_y = [];
 emitt_4d = [];
 bunch_length = [];
 T = [];
-num_turns = 100;
+num_turns = 1;
 for i=1:num_turns
-    L.set_nsteps(100);
+    L.set_nsteps(500);
+    L.set_tt_nsteps(100);
     emitt_xi = B0.get_info().emitt_x;
     emitt_yi = B0.get_info().emitt_y;
     emitt_4di = B0.get_info().emitt_4d;
@@ -56,12 +57,14 @@ for i=1:num_turns
     disp(i)
     disp(emitt_4di)
     disp(emitt_4di *mass / P_ref )
-    save -ascii 'Results/RFT_nemit_x_nothing.dat' emitt_x
-    save -ascii 'Results/RFT_nemit_y_nothing.dat' emitt_y
-    save -ascii 'Results/RFT_nemit_4d_nothing.dat' emitt_4d
-    save -ascii 'Results/RFT_bl_nothing.dat' bunch_length
-    %T = [T; L.get_transport_table("%S %emitt_x %emitt_y %sigma_t %N %beta_x %beta_y")];
+    %save -ascii 'Results/RFT_nemit_x_nothing.dat' emitt_x
+    %save -ascii 'Results/RFT_nemit_y_nothing.dat' emitt_y
+    %save -ascii 'Results/RFT_nemit_4d_nothing.dat' emitt_4d
+    %save -ascii 'Results/RFT_bl_nothing.dat' bunch_length
+    % T = [T; L.get_transport_table("%S  %emitt_x %emitt_y %sigma_t %N %beta_x %beta_y")];
     B1 = L.track(B0);
     B0 = B1;
+    T = [T; L.get_transport_table("%S %mean_x %mean_t %N %beta_x %beta_y")];
+    save -ascii 'Results/transport_table.dat' T
 end
 

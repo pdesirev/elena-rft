@@ -1,70 +1,34 @@
 addpath('/home/pdesirev/rf-track-2.1')
 RF_Track;
+RF_Track.number_of_threads = 8;
 
 % Gaussian buch
-M = load('Results/initial_particles.dat');
+M = load('Results/initial_particles_V.dat');
 mass = RF_Track.protonmass;
 Q = -1; % antiprotons
-charge = 1e7;
-B0_ = Bunch6d(mass, charge, Q, M);
-B0 = Bunch6dT(B0_);
+charge = 5e7;
+B0 = Bunch6dT(mass, charge, Q, M);
 
 P_ref = 13.7; % MeV/c
 mass = RF_Track.protonmass;
 K = 0.1;
 E = K + mass;
 beta_rel = P_ref/E;
-% Define IBS
-% Read lattice file
 
-% ALWAYS CHECK THAT THE TWISS FILE WAS GENERATED WITH THE GOOD PARAMETERS
-% acc-models-elena/scenarios/highenergy.beam -- change if needed
 L = Lattice("elena.tws"); % To be generated with the notebook. Adapt the magnitudes
 h = 4 % up to 4 bunches
 length = L.get_length();
 c = 299792458;
 f_rf = h * c * beta_rel / length;
 
-A = L{'*'};
-for i = 1:numel(A)
-    elname = A{i}.get_name();
-    if strcmp(elname, 'LNR.ACWO2.0530')
-        l_rf = A{i}.get_length();
-        P = Pillbox_Cavity(20.0/l_rf, f_rf,l_rf, 1.0);
-        P.set_phid(-90.0);
-        A{i}.replace_with(P);
-    end
-end
-P_final = L.autophase(Bunch6d(RF_Track.protonmass, 0.0, -1, [ 0 0 0 0 0 P_ref ]))
-
-
 V = Volume();
+V.odeint_algorithm = 'analytic';
 V.add(L, 0.0, 0.0, 0.0, reference='entrance');
-% TURNS
-emitt_x = [];
-emitt_y = [];
-emitt_4d = [];
-bunch_length = [];
-T = [];
-num_turns = 10;
-for i=1:num_turns
-    V.dt_mm = 10;
-    emitt_xi = B0.get_info().emitt_x;
-    emitt_yi = B0.get_info().emitt_y;
-    emitt_4di = B0.get_info().emitt_4d;
-    bunch_lengthi = B0.get_info().sigma_Z / RF_Track.ns;
-    emitt_x = [emitt_x; emitt_xi];
-    emitt_y = [emitt_y; emitt_yi];
-    emitt_4d = [emitt_4d; emitt_4di];
-    bunch_length = [bunch_length; bunch_lengthi];
-    disp(i)
-    disp(emitt_4di)
-    save -ascii 'Results/RFT_nemit_x_nothing.dat' emitt_x
-    save -ascii 'Results/RFT_nemit_y_nothing.dat' emitt_y
-    save -ascii 'Results/RFT_nemit_4d_nothing.dat' emitt_4d
-    save -ascii 'Results/RFT_bl_nothing.dat' bunch_length
-    %T = [T; L.get_transport_table("%S %emitt_x %emitt_y %sigma_t %N %beta_x %beta_y")];
-    B1 = V.track(B0);
-    B0 = B1;
-end
+V.verbosity = 1;
+V.t_max_mm = L.get_length() / beta_rel *1e3 * 100;
+V.dt_mm = 300;
+V.tt_dt_mm = 10000;
+B1 = V.track(B0);
+T = V.get_transport_table("%mean_Z %emitt_x %emitt_y %sigma_Z %N");
+save -text Results/transport_table_nothing.dat T
 

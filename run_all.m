@@ -10,7 +10,7 @@ mass = RF_Track.protonmass;
 Q = -1; % antiprotons
 charge = 1e7;
 % Gaussian buch
-M = load('Results/initial_particles.dat');
+M = load('Results/initial_particles_L.dat');
 B0 = Bunch6d(mass, charge, Q, M);
 P_ref = 13.7; % MeV/c
 mass = RF_Track.protonmass;
