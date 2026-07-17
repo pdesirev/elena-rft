@@ -1,7 +1,7 @@
 addpath('/home/pdesirev/rf-track-2.1')
 RF_Track;
 %%%%%%% BEAM CHARACTERIZATION
-N_particles = 10000; % number of macroparticles per bunch
+N_particles = 1000; % number of macroparticles per bunch
 P_ref = 13.7; % MeV/c
 mass = RF_Track.protonmass;
 Q = -1; % antiprotons
