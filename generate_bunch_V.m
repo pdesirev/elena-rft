@@ -14,7 +14,7 @@ gemitt_x = 0.5; % Geometric emittance m
 nemitt_x = gemitt_x * P_ref / mass; % Normalized emittance in m
 FWHM = 150 * RF_Track.ns;
 sigmat = FWHM / 2.355; % Gaussian approx
-sigmapt = 0.2 % now it is not in any percentage
+sigmapt = 0.0 % now it is not in any percentage
 
 %% CHANGE OF UNITS TO PROPER RF-TRACK UNITS
 T = Bunch6dT_twiss();
@@ -23,12 +23,14 @@ T.emitt_y = nemitt_x; % mm.mrad == micron
 T.sigma_z = sigmat * beta_rel; % mm/c
 T.sigma_pz = sigmapt; % permil
 % To be computed from the twiss table
-T.beta_x = 1.770369896; % Actualized
-T.beta_y = 2.691651829; % Actualized
-T.alpha_x = 1.497350649e-14; % Actualized
-T.alpha_y = 3.481504344e-16; % Actualized
-T.disp_x = 68.779690;
-T.disp_px = 1.776356839e-15;
+%T.beta_x = 1.77828956; % Actualized
+T.beta_y = 2.68096546; % Actualized
+T.alpha_x = -0.0006845884036; % Actualized
+T.alpha_y = -0.003980352848; % Actualized
+%T.disp_x = 68.779690;
+%T.disp_px = 1.776356839e-15;
+%T.disp_y = -1.554330053;
+%T.disp_py = -0.6858304775;
 
 B0 = Bunch6dT(mass, charge, Q, P_ref, T, N_particles);
 M = B0.get_phase_space();

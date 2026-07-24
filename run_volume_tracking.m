@@ -20,7 +20,7 @@ V.dt_mm = 10;
 V.set_s0 = 0.0;
 %V.sc_dt_mm = 400;
 V.tt_dt_mm = 1000;
-V.t_max_mm = RCS.get_length() * 1e3 *2 / beta_rel; % about 10 turns
+V.t_max_mm = RCS.get_length() * 1e3 *50 / beta_rel; % about 10 turns
 
 xa = linspace(-9,1,2000);   % x [m]
 ya = linspace(-0.05,0.05,4); % y [m]

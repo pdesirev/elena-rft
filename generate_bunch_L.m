@@ -9,12 +9,12 @@ E = K + mass;
 beta_rel = P_ref/E;
 
 Q = -1; % antiprotons
-charge = 5e7;
+charge = 1e7;
 gemitt_x = 0.5; % Geometric emittance m
 nemitt_x = gemitt_x * P_ref / mass; % Normalized emittance in m
 FWHM = 150 * RF_Track.ns;
 sigmat = FWHM / 2.355; % Gaussian approx
-sigmapt = 0.2 % now it is not in any percentage
+sigmapt = 0.5 % now it is not in any percentage
 
 %% CHANGE OF UNITS TO PROPER RF-TRACK UNITS
 T = Bunch6d_twiss();

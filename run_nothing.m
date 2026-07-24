@@ -27,11 +27,14 @@ f_rf = h * c * beta_rel / length;
 A = L{'*'};
 for i = 1:numel(A)
     elname = A{i}.get_name();
+    l_rf = A{i}.get_length();
     if strcmp(elname, 'LNR.ACWO2.0530')
-        l_rf = A{i}.get_length();
-        P = Pillbox_Cavity(20.0/l_rf, f_rf,l_rf, 1.0);
+        P = Pillbox_Cavity(20.0e3/l_rf, f_rf,l_rf, 1.0);
         P.set_phid(-90.0);
         A{i}.replace_with(P);
+    end
+    if l_rf == 0.0 
+        A{i}.remove;
     end
 end
 P_final = L.autophase(Bunch6d(RF_Track.protonmass, 0.0, -1, [ 0 0 0 0 0 P_ref ]))
@@ -42,29 +45,13 @@ emitt_y = [];
 emitt_4d = [];
 bunch_length = [];
 T = [];
-num_turns = 1;
+num_turns = 1000;
 for i=1:num_turns
     L.set_nsteps(500);
-    L.set_tt_nsteps(100);
-    emitt_xi = B0.get_info().emitt_x;
-    emitt_yi = B0.get_info().emitt_y;
-    emitt_4di = B0.get_info().emitt_4d;
-    bunch_lengthi = B0.get_info().sigma_t / RF_Track.ns;
-    emitt_x = [emitt_x; emitt_xi];
-    emitt_y = [emitt_y; emitt_yi];
-    emitt_4d = [emitt_4d; emitt_4di];
-    bunch_length = [bunch_length; bunch_lengthi];
-    disp(i)
-    disp(emitt_4di)
-    disp(emitt_4di *mass / P_ref )
-    %save -ascii 'Results/RFT_nemit_x_nothing.dat' emitt_x
-    %save -ascii 'Results/RFT_nemit_y_nothing.dat' emitt_y
-    %save -ascii 'Results/RFT_nemit_4d_nothing.dat' emitt_4d
-    %save -ascii 'Results/RFT_bl_nothing.dat' bunch_length
-    % T = [T; L.get_transport_table("%S  %emitt_x %emitt_y %sigma_t %N %beta_x %beta_y")];
+    L.set_tt_nsteps(1);
     B1 = L.track(B0);
     B0 = B1;
-    T = [T; L.get_transport_table("%S %mean_x %mean_t %N %beta_x %beta_y")];
-    save -ascii 'Results/transport_table.dat' T
+    T = [T; L.get_transport_table("%S %emitt_x %emitt_y %emitt_4d %mean_t %sigma_t %mean_P %N")];
+    save -ascii 'Results/transport_table_LATTICE_Nothing.dat' T
 end
 
