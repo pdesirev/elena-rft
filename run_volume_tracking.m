@@ -13,6 +13,10 @@ RCS = Lattice('elena.tws');
 RCS.set_width(1.0);
 RCS.set_height(0.1);
 
+for sb = RCS.get_sbends()
+    sb{1}.set_hgap(0.1)
+end
+
 %% Place the lattice in Volume for time integration
 V = Volume();
 V.add (RCS, 0, 0, 0, reference='entrance');
@@ -23,35 +27,34 @@ V.tt_dt_mm = 1000;
 V.t_max_mm = RCS.get_length() * 1e3 *50 / beta_rel; % about 10 turns
 
 xa = linspace(-9,1,2000);   % x [m]
-ya = linspace(-0.05,0.05,4); % y [m]
-za = linspace(-6,6,3000);     % z [m]
+ya = linspace(-0.1,0.1,11); % y [m]
+za = linspace(-6,6,3000);   % z [m]
 
 [X,Y,Z] = ndgrid(xa*1e3, ya*1e3, za*1e3); % mm
 
+tic
 [E,B] = V.get_field(X(:),Y(:),Z(:),0);
+toc
 
 B(isnan(B)) = 0;
 
 Bx = reshape(B(:,1),size(X));
 By = reshape(B(:,2),size(X));
 Bz = reshape(B(:,3),size(X));
-save -text Bx.dat Bx
-save -text By.dat By
-save -text Bz.dat Bz
-save -text xa.dat xa
-save -text ya.dat ya
-save -text za.dat za
+save -binary -zip Bmap.dat Bx By Bz xa ya za
 
-%figure(1)
-%clf
-%pcolor(za, xa, By)
-%xlim([ min(za), max(za) ])
-%ylim([ min(xa), max(xa) ])
+By = reshape(By(:,6,:), length(xa), length(za));
 
-%xlabel('Z [m]')
-%ylabel('X [m]')
-%daspect([ 1 1 ])
-%shading flat
+figure(1)
+clf
+pcolor(za, xa, By)
+xlim([ min(za), max(za) ])
+ylim([ min(xa), max(xa) ])
+
+xlabel('Z [m]')
+ylabel('X [m]')
+daspect([ 1 1 ])
+shading flat
 
 %%  Define a Bunch
 %M = load('Results/initial_particles_V.dat');
