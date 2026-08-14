@@ -1,6 +1,7 @@
 addpath('/home/pdesirev/rf-track-2.1')
 RF_Track;
-IBS = IntraBeamScattering (32,32,32);
+RF_Track_number_of_threads = 8;
+IBS = IntraBeamScattering (32,32,32, 200);
 
 %%%%%%% BEAM CHARACTERIZATION
 mass = RF_Track.protonmass;
@@ -27,11 +28,10 @@ A = L{'*'};
 % The solenoids are giving problems!!!
 % UPDATE: Together with the rfcavity, I have changed it for a drift
 for i = 1:numel(A)
-     A{i}.add_collective_effect(IBS);
-         elname = A{i}.get_name();
+    elname = A{i}.get_name();
     if strcmp(elname, 'LNR.ACWO2.0530')
         l_rf = A{i}.get_length();
-        P = Pillbox_Cavity(20.0/l_rf, f_rf,l_rf, 1.0);
+        P = Pillbox_Cavity(12.0/l_rf, f_rf,l_rf, 1.0);
         P.set_phid(-90.0);
         A{i}.replace_with(P);
     end
@@ -40,30 +40,21 @@ for i = 1:numel(A)
 P_final = L.autophase(Bunch6d(RF_Track.protonmass, 0.0, -1, [ 0 0 0 0 0 P_ref ]))
 
 % TURNS
-emitt_x = [];
-emitt_y = [];
-emitt_4d = [];
-bunch_length = [];
 T = [];
-num_turns = 100;
+num_turns = 30000;
+L.add_collective_effect(IBS);
 for i=1:num_turns
-    L.set_nsteps(100);
-    L.set_cfx_nsteps(50);
+    L.set_nsteps(600);
+    L.set_cfx_nsteps(100);
+    L.set_tt_nsteps(1);
+    if (mod(i, 50) == 0)
+        disp("Only IBS")
+        disp(i)
+        disp(B1.get_info().sigma_t / RF_Track.ns * 2.355)
+        disp(B1.get_info().emitt_y)
+        T = [T; L.get_transport_table("%S %emitt_x %emitt_y %emitt_4d %mean_t %sigma_t %mean_P %N")];
+        save -ascii 'Results/transport_table_LATTICE_IBS.dat' T
+    end
     B1 = L.track(B0);
-    disp(i)
-    emitt_xi = B0.get_info().emitt_x;
-    emitt_yi = B0.get_info().emitt_y;
-    emitt_4di = B0.get_info().emitt_4d;
-    bunch_lengthi = B0.get_info().sigma_t / RF_Track.ns;
-    disp(emitt_4di)
-    emitt_x = [emitt_x; emitt_xi];
-    emitt_y = [emitt_y; emitt_yi];
-    emitt_4d = [emitt_4d; emitt_4di];
-    bunch_length = [bunch_length; bunch_lengthi];
-    save -ascii 'Results/RFT_nemit_x_IBS.dat' emitt_x
-    save -ascii 'Results/RFT_nemit_y_IBS.dat' emitt_y
-    save -ascii 'Results/RFT_nemit_4d_IBS.dat' emitt_4d
-    save -ascii 'Results/RFT_bl_IBS.dat' bunch_length
-    T = [T; L.get_transport_table("%S %emitt_x %emitt_y %sigma_t %N %beta_x %beta_y")];
     B0 = B1;
 end

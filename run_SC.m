@@ -1,5 +1,6 @@
 addpath('/home/pdesirev/rf-track-2.1')
 RF_Track;
+RF_Track_number_of_threads = 8;
 SC = SC = SpaceCharge_PIC_FreeSpace(32, 32, 32);
 RF_Track.SC_engine = SC;
 
@@ -34,7 +35,7 @@ for i = 1:numel(A)
     elname = A{i}.get_name();
     l_rf = A{i}.get_length();
     if strcmp(elname, 'LNR.ACWO2.0530')
-        P = Pillbox_Cavity(20.0e3/l_rf, f_rf,l_rf, 1.0);
+        P = Pillbox_Cavity(12.0e3/l_rf, f_rf,l_rf, 1.0);
         P.set_phid(-90.0);
         A{i}.replace_with(P);
     end
@@ -45,21 +46,20 @@ end
 P_final = L.autophase(Bunch6d(RF_Track.protonmass, 0.0, -1, [ 0 0 0 0 0 P_ref ]));
 
 % TURNS
-emitt_x = [];
-emitt_y = [];
-emitt_4d = [];
-bunch_length = [];
 T = [];
 num_turns = 30000;
 for i=1:num_turns
-    L.set_nsteps(300);
-    L.set_sc_nsteps(30);
+    L.set_nsteps(600);
+    L.set_sc_nsteps(100);
     L.set_tt_nsteps(1);
     if (mod(i, 50) == 0)
+    disp("Only SC")
         disp(i)
+        disp(B1.get_info().sigma_t / RF_Track.ns * 2.355)
+        disp(B1.get_info().emitt_y)
+        T = [T; L.get_transport_table("%S %emitt_x %emitt_y %emitt_4d %mean_t %sigma_t %mean_P %N")];
+        save -ascii 'Results/transport_table_LATTICE_SC.dat' T
     end
     B1 = L.track(B0);
     B0 = B1;
-    T = [T; L.get_transport_table("%S %emitt_x %emitt_y %emitt_4d %mean_t %sigma_t %mean_P %N")];
-    save -ascii 'Results/transport_table_LATTICE_SC.dat' T
 end
