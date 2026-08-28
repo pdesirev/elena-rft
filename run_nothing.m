@@ -1,6 +1,6 @@
-addpath('/home/pdesirev/rf-track-2.1')
+%addpath('/home/pdesirev/rf-track-2.1')
 RF_Track;
-
+RF_Track_number_of_threads = 8;
 % Gaussian buch
 M = load('Results/initial_particles_L.dat');
 mass = RF_Track.protonmass;
@@ -29,7 +29,7 @@ for i = 1:numel(A)
     elname = A{i}.get_name();
     l_rf = A{i}.get_length();
     if strcmp(elname, 'LNR.ACWO2.0530')
-        P = Pillbox_Cavity(20.0e3/l_rf, f_rf,l_rf, 1.0);
+        P = Pillbox_Cavity(13.0e3/l_rf, f_rf,l_rf, 1.0);
         P.set_phid(-90.0);
         A{i}.replace_with(P);
     end
@@ -40,18 +40,20 @@ end
 P_final = L.autophase(Bunch6d(RF_Track.protonmass, 0.0, -1, [ 0 0 0 0 0 P_ref ]))
 
 % TURNS
-emitt_x = [];
-emitt_y = [];
-emitt_4d = [];
-bunch_length = [];
 T = [];
-num_turns = 1000;
+num_turns = 30000;
 for i=1:num_turns
-    L.set_nsteps(500);
+    L.set_nsteps(60);
     L.set_tt_nsteps(1);
+    if (mod(i, 50) == 0)
+        disp("No effect")
+        disp(i)
+        disp(B1.get_info().sigma_t / RF_Track.ns * 2.355)
+        disp(B1.get_info().emitt_y)
+        T = [T; L.get_transport_table("%S %emitt_x %emitt_y %emitt_4d %mean_t %sigma_t %mean_P %N")];
+        save -ascii 'Results/transport_table_LATTICE_nothing.dat' T
+    end
     B1 = L.track(B0);
     B0 = B1;
-    T = [T; L.get_transport_table("%S %emitt_x %emitt_y %emitt_4d %mean_t %sigma_t %mean_P %N")];
-    save -ascii 'Results/transport_table_LATTICE_Nothing.dat' T
 end
 
