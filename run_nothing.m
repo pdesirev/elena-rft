@@ -54,8 +54,6 @@ for i=1:num_turns
         disp(i)
         disp(B1.get_info().sigma_t / RF_Track.ns * 2.355)
         disp(B1.get_info().emitt_y)
-        T = [T; L.get_transport_table("%S %emitt_x %emitt_y %emitt_4d %mean_t %sigma_t %mean_P %N")];
-        save -ascii 'Results/transport_table_LATTICE_nothing.dat' T
         % LOST PARTICLES
         Lo = L.get_lost_particles();
         Loss = [Loss; Lo];
