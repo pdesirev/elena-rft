@@ -30,7 +30,7 @@ for i = 1:numel(A)
     elname = A{i}.get_name();
     l_rf = A{i}.get_length();
     if strcmp(elname, 'LNR.ACWO2.0530')
-        P = Pillbox_Cavity(12.0e3/l_rf, f_rf,l_rf, 1.0);
+        P = Pillbox_Cavity(20/l_rf, f_rf,l_rf, 1.0);
         P.set_phid(-90.0);
         A{i}.replace_with(P);
     end
@@ -44,8 +44,7 @@ L.append(Screen());
 
 % TURNS
 T = [];
-Loss = [];
-num_turns = 20000;
+num_turns = 60000;
 for i=1:num_turns
     L.set_nsteps(60);
     L.set_tt_nsteps(1);

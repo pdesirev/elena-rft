@@ -32,7 +32,7 @@ for i = 1:numel(A)
     l_rf = A{i}.get_length();
     if strcmp(elname, 'LNR.ACWO2.0530')
         l_rf = A{i}.get_length();
-        P = Pillbox_Cavity(13.0e3/l_rf, f_rf,l_rf, 1.0);
+        P = Pillbox_Cavity(20/l_rf, f_rf,l_rf, 1.0);
         P.set_phid(-90.0);
         A{i}.replace_with(P);
     end
@@ -45,7 +45,7 @@ P_final = L.autophase(Bunch6d(RF_Track.protonmass, 0.0, -1, [ 0 0 0 0 0 P_ref ])
 
 % TURNS
 T = [];
-num_turns = 100000;
+num_turns = 60000;
 L.add_collective_effect(IBS);
 for i=1:num_turns
     L.set_nsteps(60);
