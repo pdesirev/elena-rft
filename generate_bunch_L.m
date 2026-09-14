@@ -14,7 +14,7 @@ gemitt_x = 0.5; % Geometric emittance m
 nemitt_x = gemitt_x * P_ref / mass; % Normalized emittance in m
 FWHM = 150 * RF_Track.ns;
 sigmat = FWHM / 2.355; % Gaussian approx
-sigmapt = 0.5 % now it is not in any percentage
+sigmapt = beta_rel * 0.5; % sigma_pt in RF_track is std(E)/P instead of std(P)/P
 
 %% CHANGE OF UNITS TO PROPER RF-TRACK UNITS
 T = Bunch6d_twiss();
