@@ -1,4 +1,4 @@
-addpath('/home/pdesirev/rf-track-2.1')
+% addpath('/home/pdesirev/rf-track-2.1')
 RF_Track;
 %%%%%%% BEAM CHARACTERIZATION
 N_particles = 10000; % number of macroparticles per bunch
@@ -9,12 +9,14 @@ E = K + mass;
 beta_rel = P_ref/E;
 
 Q = -1; % antiprotons
-charge = 1e7;
+charge = 2.5e6;
 gemitt_x = 0.5; % Geometric emittance m
 nemitt_x = gemitt_x * P_ref / mass; % Normalized emittance in m
 FWHM = 150 * RF_Track.ns;
-sigmat = FWHM / 2.355; % Gaussian approx
+%sigmat = FWHM / 2.355; % Gaussian approx
+sigmat = 120 * RF_Track.ns;
 sigmapt = beta_rel * 0.5; % sigma_pt in RF_track is std(E)/P instead of std(P)/P
+sigmpapt = beta_rel * 0.954;
 
 %% CHANGE OF UNITS TO PROPER RF-TRACK UNITS
 T = Bunch6d_twiss();
@@ -25,10 +27,11 @@ T.sigma_pt = sigmapt; % permil
 % To be computed from the twiss table
 T.beta_x = 1.770369896; % Actualized
 T.beta_y = 2.691651829; % Actualized
-T.alpha_x = 1.497350649e-14; % Actualized
+T.alpha_x = 1.373782877e-14; % Actualized
 T.alpha_y = 3.481504344e-16; % Actualized
-T.disp_x = 68.779690;
+T.disp_x = 68.7796905;
 T.disp_px = 1.776356839e-15;
+
 
 B0 = Bunch6d(mass, charge, Q, P_ref, T, N_particles);
 M = B0.get_phase_space();
